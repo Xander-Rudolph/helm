@@ -99,7 +99,7 @@ jobs:
                   $COMMIT_MESSAGE == *"feature:"* ]]; then
             COMMIT_TYPE="minor"
           elif [[ $COMMIT_MESSAGE != *"bump:"* ]] ; then
-            COMMIT_TYPE="minor"
+            COMMIT_TYPE="patch"
           fi
 
           # Read the current version from Chart.yaml
