@@ -1,0 +1,144 @@
+name: Release Charts
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+env:
+  working-directory: 'charts'
+
+jobs:
+  changes:
+    name: Check for changes
+    runs-on: ubuntu-latest
+    outputs:
+      changes: ${{ steps.changes.outputs.changes }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Get changes
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          # TODO: there must be a way to filter what i don't want and summarize it so I don't need to declare it here
+          filters: |
+            swissserve:
+              - '${{ env.working-directory }}/swissserve/**'
+
+  scan:
+    permissions:
+      contents: write
+    needs: changes
+    if: ${{ github.ref_name != 'main' && needs.changes.outputs.changes != '[]' }}
+    strategy:
+      matrix:
+        working_dir: ${{ fromJson(needs.changes.outputs.changes) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # head_ref is used in the context of a PR and changes only runs on PR
+          ref: ${{ github.head_ref }}
+
+      - name: Linting ${{ env.working-directory }}/${{ matrix.working_dir }}
+        id: linting
+        working-directory: ${{ env.working-directory }}
+        continue-on-error: false
+        run: |
+          d="${{ matrix.working_dir }}"
+          echo "Running on directory $d"
+          helm lint $d
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Bumping ${{ matrix.working_dir }} Chart Version
+        run: |
+          cd ${{ env.working-directory }}/${{ matrix.working_dir }}
+
+          # Function to get the next semantic version
+          get_next_version() {
+            local current_version=$1
+            local commit_type=$2
+            local major=$(echo "$current_version" | cut -d '.' -f1)
+            local minor=$(echo "$current_version" | cut -d '.' -f2)
+            local patch=$(echo "$current_version" | cut -d '.' -f3)
+
+            case "$commit_type" in
+            "major")
+              echo "$((major + 1)).0.0"
+              ;;
+            "minor")
+              echo "$major.$((minor + 1)).0"
+              ;;
+            "patch")
+              echo "$major.$minor.$((patch + 1))"
+              ;;
+            *)
+              echo "$current_version"
+              ;;
+            esac
+          }
+
+          # Determine the type of commit
+          COMMIT_MESSAGE=$(git log -n 1 --pretty=format:"%s")
+          if [[ $COMMIT_MESSAGE == *"major:"* || 
+                $COMMIT_MESSAGE == *!:* ]]; then
+            COMMIT_TYPE="major"
+          elif [[ $COMMIT_MESSAGE == *"feat:"* || 
+                  $COMMIT_MESSAGE == *"feature:"* ]]; then
+            COMMIT_TYPE="minor"
+          elif [[ $COMMIT_MESSAGE != *"bump:"* ]] ; then
+            COMMIT_TYPE="minor"
+          fi
+
+          # Read the current version from Chart.yaml
+          CHART_VERSION=$(grep 'version:' Chart.yaml | sed 's/version: //')
+          echo "Current Version: $CHART_VERSION"
+
+          # Calculate the next version
+          NEXT_VERSION=$(get_next_version "$CHART_VERSION" "$COMMIT_TYPE")
+          echo "Bump to: $NEXT_VERSION"
+
+          # Update the Chart.yaml with the new version
+          sed -i "s/version: .*/version: $NEXT_VERSION/" Chart.yaml
+
+          # Commit and push the changes
+          git add Chart.yaml
+          git commit -m "bump: ${{ matrix.working_dir }} to $NEXT_VERSION"
+          git push 
+
+  release:
+    if: github.event_name == 'push' && github.ref_name == 'main'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.6.0
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          # CR_SKIP_EXISTING: true

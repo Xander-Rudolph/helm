@@ -1,0 +1,11 @@
+{{ if and (ne .Values.image.domainPath "") (hasKey .Values.image "stripPath") }}
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: "{{ include ".helm.fullname" . }}-strip"
+  namespace: {{ include ".helm.fullname" . }}
+spec:
+  stripPrefix:
+    prefixes:
+      - "/{{ .Values.image.domainPath }}"
+{{ end }}
