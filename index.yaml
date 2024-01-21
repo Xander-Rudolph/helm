@@ -26,6 +26,24 @@ entries:
   umbrella:
   - apiVersion: v2
     appVersion: 0.0.1
+    created: "2024-01-21T21:30:30.880349889Z"
+    dependencies:
+    - name: traefik
+      repository: https://helm.traefik.io/traefik
+      version: ^10.30.0
+    - alias: hello-world
+      name: swissserve
+      repository: https://xander-rudolph.github.io/helm
+      version: ^0
+    description: A Helm chart for Kubernetes
+    digest: 4935db92517ed17e135e4197e3d3802b66465b0aca43805d78d0358fc2e336ca
+    name: umbrella
+    type: application
+    urls:
+    - https://github.com/Xander-Rudolph/helm/releases/download/umbrella-1.0.1/umbrella-1.0.1.tgz
+    version: 1.0.1
+  - apiVersion: v2
+    appVersion: 0.0.1
     created: "2024-01-21T19:44:23.933704379Z"
     dependencies:
     - name: traefik
@@ -42,4 +60,4 @@ entries:
     urls:
     - https://github.com/Xander-Rudolph/helm/releases/download/umbrella-1.0.0/umbrella-1.0.0.tgz
     version: 1.0.0
-generated: "2024-01-21T21:29:17.791263997Z"
+generated: "2024-01-21T21:30:30.880361561Z"
