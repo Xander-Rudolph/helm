@@ -3,6 +3,17 @@ entries:
   swissserve:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2024-01-21T21:29:17.662934345Z"
+    description: A Helm chart for Kubernetes
+    digest: f4a0185eaa2980a4583cef6097962b07e2a4b8db3ca38a0dc68b1b34e8ca2e17
+    icon: file://icon.png
+    name: swissserve
+    type: application
+    urls:
+    - https://github.com/Xander-Rudolph/helm/releases/download/swissserve-0.4.1/swissserve-0.4.1.tgz
+    version: 0.4.1
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2024-01-21T19:28:18.199149519Z"
     description: A Helm chart for Kubernetes
     digest: c2835dcd0b94b55e4fa690b1a549c9efe69de1649626ecacd74f2fdedd484f48
@@ -31,4 +42,4 @@ entries:
     urls:
     - https://github.com/Xander-Rudolph/helm/releases/download/umbrella-1.0.0/umbrella-1.0.0.tgz
     version: 1.0.0
-generated: "2024-01-21T19:44:23.933712905Z"
+generated: "2024-01-21T21:29:17.791263997Z"
