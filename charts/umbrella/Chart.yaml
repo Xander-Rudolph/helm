@@ -40,5 +40,5 @@ dependencies:
     alias: hello-world
   - name: swissserve
     version: "^0"
-    repository: file://../swissserve
+    repository: file://./charts/swissserve
     alias: local-world
