@@ -1,0 +1,81 @@
+fullnameOverride: "umbrella"
+
+dockerCredentials:
+  username: YOUR_GITHUB_USER # THESE MUST BE UPDATED IF USING PRIVATE GITHUB DOCKER IMAGES
+  token: YOUR_GITHUB_TOKEN
+
+hello-world:
+  fullnameOverride: hello-world
+  namespaceOverride: hello-world-example
+  image:
+    replicaCount: 1
+    repository: crccheck/hello-world
+    pullPolicy: Always
+    containerPort: 8000
+    tag: latest
+
+    # Optional pod Settings
+    # hostname: hellohost
+    # domainPath: hello
+    # stripPath: true # this will turn on/off the strip middleware for the domainPath
+    # envFrom:
+    #   secretRefs:
+    #     - secret-name
+    # env:
+    #   - name: ENVVARIABLENAME
+    #     value: VALUE
+  # Optional Service Settings
+  # sidecarimage:
+  #   name: "logging-sidecar"
+  #   repository: mylogging-sidecar
+  #   pullPolicy: Always
+  #   tag: "latest"
+  # imagePullSecrets:
+  #   - name: dockerconfigjson-github-com
+  # service:
+  #   type: ClusterIP
+  # resources:
+  #   requests:
+  #     cpu: 100m
+  #     memory: 250Mi
+  # serviceAccount:
+  #   create: true
+  #   annotations: {}
+  #   name: ""
+  # autoscaling:
+  #   enabled: false
+  #   minReplicas: 1
+  #   maxReplicas: 100
+  #   targetCPUUtilizationPercentage: 80
+
+
+# https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
+traefik:
+  image:
+    pullPolicy: Always
+  namespaceOverride: traefik # force the namespace to be traefik instead of using release naming
+  # When using an aks, this annotation will provision an internal load balancer for routing. If not provided it will create a public IP
+  # service:
+  #   type: LoadBalancer
+  #   annotations: {
+  #     service.beta.kubernetes.io/azure-load-balancer-internal: "true",
+  #   }
+  providers:
+    kubernetesCRD:
+      # namespaces: ['traefik'] # if left blank, default namespace is watched
+      namespaces: ['traefik','hello-world-example'] # if defining an additional namespace, ensure it is listed like so
+      allowCrossNamespace: true
+      allowExternalNameServices: true
+  ingressRoute:
+    dashboard:
+      matchRule: PathPrefix(`/dashboard`,`/dashboard/`) || PathPrefix(`/api`) # this doesn't appear to be honored
+      # entryPoints: ["web"] # this is not recommended unless you are using an internal load balancer
+
+local-world:
+  fullnameOverride: hello-world-local
+  image:
+    replicaCount: 1
+    repository: crccheck/hello-world
+    pullPolicy: Always
+    containerPort: 8000
+    tag: latest
