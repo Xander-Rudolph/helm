@@ -1,21 +1,21 @@
-{{ if and (ne .Values.image.domainPath "") (hasKey .Values.image "domainPath") }}
+{{ if and (ne .Values.domainPath "") (hasKey .Values "domainPath") }}
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: "{{ include ".helm.fullname" . }}-route"
-  namespace: {{ include ".helm.fullname" . }}
+  name: "{{ include "helm.fullname" . }}-route"
+  namespace: {{ include "helm.namespace" . }}
 spec:
   entryPoints:
     - web
   routes:
-    - match: (PathPrefix("/{{ .Values.image.domainPath }}"))
+    - match: (PathPrefix("/{{ .Values.domainPath }}"))
       kind: Rule
       services:
-        - name: {{ include ".helm.fullname" . }}
+        - name: {{ include "helm.fullname" . }}
           kind: Service
           port: {{ .Values.image.containerPort }}
       {{ if (hasKey .Values.image "stripPath") }}
       middlewares:
-      - name: "{{ include ".helm.fullname" . }}-strip"
+      - name: "{{ include "helm.fullname" . }}-strip"
       {{ end }}
 {{ end }}

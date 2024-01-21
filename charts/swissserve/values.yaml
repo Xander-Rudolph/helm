@@ -1,5 +1,7 @@
 nameOverride: ""
+namespaceOverride: ""
 fullnameOverride: ""
+domainPath: "" 
 service:
   type: ClusterIP
   port: 80
@@ -10,7 +12,6 @@ image:
   containerPort: 1234
   tag: "latest"
 #   hostname: internalhostname
-#   domainPath: "" 
 #   stripPath: true 
 #   envFrom:
 #     secretRefs:
@@ -55,7 +56,7 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
-# if using traefik, use the image.domainPath to control this ingress
+# if using traefik, use the image.domainPath to control the ingress and not this
 ingress:
   enabled: false
   className: ""

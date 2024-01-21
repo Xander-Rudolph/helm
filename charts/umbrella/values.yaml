@@ -4,9 +4,20 @@ dockerCredentials:
   username: YOUR_GITHUB_USER # THESE MUST BE UPDATED IF USING PRIVATE GITHUB DOCKER IMAGES
   token: YOUR_GITHUB_TOKEN
 
+# example of a working path
+local-world:
+  domainPath: hello
+  image:
+    replicaCount: 1
+    repository: crccheck/hello-world
+    pullPolicy: Always
+    containerPort: 8000
+    tag: latest
+
 hello-world:
   fullnameOverride: hello-world
   namespaceOverride: hello-world-example
+  domainPath: hello-example
   image:
     replicaCount: 1
     repository: crccheck/hello-world
@@ -16,7 +27,6 @@ hello-world:
 
     # Optional pod Settings
     # hostname: hellohost
-    # domainPath: hello
     # stripPath: true # this will turn on/off the strip middleware for the domainPath
     # envFrom:
     #   secretRefs:
@@ -54,29 +64,19 @@ traefik:
   image:
     pullPolicy: Always
   namespaceOverride: traefik # force the namespace to be traefik instead of using release naming
+  providers:
+    kubernetesCRD:
+      namespaces: ['traefik','hello-world-example'] # This will automatically create the namespaces, if left blank, it will use "default" namespace
+      allowCrossNamespace: true
+      allowExternalNameServices: true
+  ingressRoute:
+    dashboard:
+      matchRule: PathPrefix(`/dashboard`) || PathPrefix(`/api`) || PathPrefix(`/yourmotherwasahampster`) 
+      # matchRule: "PathPrefix(`/dashboard`,`/dashboard/`) || PathPrefix(`/api`)" # this doesn't appear to be honored
+      entryPoints: ["web"] # this is not recommended unless you are using an internal load balancer
   # When using an aks, this annotation will provision an internal load balancer for routing. If not provided it will create a public IP
   # service:
   #   type: LoadBalancer
   #   annotations: {
   #     service.beta.kubernetes.io/azure-load-balancer-internal: "true",
   #   }
-  providers:
-    kubernetesCRD:
-      # namespaces: ['traefik'] # if left blank, default namespace is watched
-      namespaces: ['traefik','hello-world-example'] # if defining an additional namespace, ensure it is listed like so
-      allowCrossNamespace: true
-      allowExternalNameServices: true
-  ingressRoute:
-    dashboard:
-      matchRule: PathPrefix(`/dashboard`,`/dashboard/`) || PathPrefix(`/api`) # this doesn't appear to be honored
-      # entryPoints: ["web"] # this is not recommended unless you are using an internal load balancer
-
-# example of a working path
-# local-world:
-#   fullnameOverride: hello-world-local
-#   image:
-#     replicaCount: 1
-#     repository: crccheck/hello-world
-#     pullPolicy: Always
-#     containerPort: 8000
-#     tag: latest
