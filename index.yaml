@@ -12,4 +12,23 @@ entries:
     urls:
     - https://github.com/Xander-Rudolph/helm/releases/download/swissserve-0.3.0/swissserve-0.3.0.tgz
     version: 0.3.0
-generated: "2024-01-21T19:28:18.19916082Z"
+  umbrella:
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2024-01-21T19:44:23.933704379Z"
+    dependencies:
+    - name: traefik
+      repository: https://helm.traefik.io/traefik
+      version: ^10.30.0
+    - alias: hello-world
+      name: swissserve
+      repository: https://xander-rudolph.github.io/helm
+      version: ^0
+    description: A Helm chart for Kubernetes
+    digest: 30d2d5a6313d7420bc8f682f7019fc9a9417eca2fdbdec7fa136958c351d83a1
+    name: umbrella
+    type: application
+    urls:
+    - https://github.com/Xander-Rudolph/helm/releases/download/umbrella-1.0.0/umbrella-1.0.0.tgz
+    version: 1.0.0
+generated: "2024-01-21T19:44:23.933712905Z"
