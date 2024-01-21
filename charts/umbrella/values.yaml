@@ -71,11 +71,12 @@ traefik:
       matchRule: PathPrefix(`/dashboard`,`/dashboard/`) || PathPrefix(`/api`) # this doesn't appear to be honored
       # entryPoints: ["web"] # this is not recommended unless you are using an internal load balancer
 
-local-world:
-  fullnameOverride: hello-world-local
-  image:
-    replicaCount: 1
-    repository: crccheck/hello-world
-    pullPolicy: Always
-    containerPort: 8000
-    tag: latest
+# example of a working path
+# local-world:
+#   fullnameOverride: hello-world-local
+#   image:
+#     replicaCount: 1
+#     repository: crccheck/hello-world
+#     pullPolicy: Always
+#     containerPort: 8000
+#     tag: latest

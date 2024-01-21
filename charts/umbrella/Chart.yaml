@@ -38,7 +38,8 @@ dependencies:
     version: "^0"
     repository: https://xander-rudolph.github.io/helm
     alias: hello-world
-  - name: swissserve
-    version: "^0"
-    repository: file://../swissserve
-    alias: local-world
+    # to test with a local chart.. use this format (depending on your working path)
+  # - name: swissserve
+  #   version: "^0"
+  #   repository: file://../swissserve
+  #   alias: local-world
