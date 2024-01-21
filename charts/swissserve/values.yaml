@@ -1,7 +1,7 @@
-nameOverride: ""
-namespaceOverride: ""
-fullnameOverride: ""
-domainPath: "" 
+nameOverride: "" # force chart name (IE release.chart)
+namespaceOverride: "" # force specific namespace
+fullnameOverride: "" # override naming
+domainPath: ""  #ingress route definition
 service:
   type: ClusterIP
   port: 80
