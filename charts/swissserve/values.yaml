@@ -2,6 +2,7 @@ nameOverride: "" # force chart name (IE release.chart)
 namespaceOverride: "" # force specific namespace
 fullnameOverride: "" # override naming
 domainPath: ""  #ingress route definition
+stripPath: true
 service:
   type: ClusterIP
   port: 80
@@ -12,7 +13,6 @@ image:
   containerPort: 1234
   tag: "latest"
 #   hostname: internalhostname
-#   stripPath: true 
 #   envFrom:
 #     secretRefs:
 #       - secret-name
