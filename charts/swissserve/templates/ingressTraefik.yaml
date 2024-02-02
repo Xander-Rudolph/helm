@@ -1,4 +1,4 @@
-{{ if and (eq .Values.domainPath "") (hasKey .Values.image "domainPath") }}
+{{ if and (eq .Values.domainPath "") (hasKey .Values "domainPath") }}
 kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:

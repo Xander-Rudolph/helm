@@ -14,7 +14,7 @@ spec:
         - name: {{ include "helm.fullname" . }}
           kind: Service
           port: {{ .Values.image.containerPort }}
-      {{ if (hasKey .Values.image "stripPath") }}
+      {{ if (hasKey .Values "stripPath") }}
       middlewares:
       - name: "{{ include "helm.fullname" . }}-strip"
       {{ end }}
