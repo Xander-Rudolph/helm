@@ -1,4 +1,4 @@
-{{ if and (ne .Values.domainPath "") (hasKey .Values.image "stripPath") }}
+{{ if and (ne .Values.domainPath "") (hasKey .Values "stripPath") }}
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
