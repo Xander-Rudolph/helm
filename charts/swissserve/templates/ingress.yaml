@@ -17,6 +17,10 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
+    app: {{ include "helm.fullname" . }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     {{- include "helm.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
@@ -26,6 +30,24 @@ spec:
   {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
   ingressClassName: {{ .Values.ingress.className }}
   {{- end }}
+  {{- if (hasKey .Values.ingress "domain" ) }}
+  tls:
+  - hosts:
+    - {{ .Values.ingress.domain | quote }}
+    secretName: {{ .Values.ingress.domain | replace "." "-" | quote }}
+  rules:
+  - host: {{ .Values.ingress.domain | quote }}
+    http:
+      paths:
+      - path: {{ .Values.ingress.path | quote }}
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ include "helm.fullname" . }}
+            port:
+              number: {{ .Values.service.port | default 80 }}
+  {{- end }}
+ 
   {{- if .Values.ingress.tls }}
   tls:
     {{- range .Values.ingress.tls }}
@@ -36,6 +58,7 @@ spec:
       secretName: {{ .secretName }}
     {{- end }}
   {{- end }}
+  {{- if (hasKey .Values.ingress "hosts" ) }}
   rules:
     {{- range .Values.ingress.hosts }}
     - host: {{ .host | quote }}
@@ -58,4 +81,5 @@ spec:
               {{- end }}
           {{- end }}
     {{- end }}
+  {{- end }}
 {{- end }}

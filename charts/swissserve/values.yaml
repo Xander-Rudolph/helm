@@ -1,17 +1,11 @@
-nameOverride: "" # force chart name (IE release.chart)
-namespaceOverride: "" # force specific namespace
-fullnameOverride: "" # override naming
-domainPath: ""  #ingress route definition
-stripPath: true
-service:
-  type: ClusterIP
-  port: 80
-
 image:
   repository: ghcr.io/yourorg/imagename # see imagePullSecrets to define github secrets
   pullPolicy: Always
-  containerPort: 1234
+  containerPort: 8080
   tag: "latest"
+#  force: true # will force pods to redeploy using timestamp label
+#  liveness: /
+#  readiness: /
 #   hostname: internalhostname
 #   envFrom:
 #     secretRefs:
@@ -21,6 +15,33 @@ image:
 #   env:
 #     - name: ENVVARIABLENAME
 #       value: VALUE
+
+# initContainer:
+#   image:
+#   tag:
+#   imagePullPolicy:
+#   command:
+#   env:
+#   - name: ENVVARIABLENAME
+#     value: VALUE
+
+azure:
+  keyVaultName: 
+  kvSecrets:
+  - "key-vault-entry"
+#   clientid:
+#   tenantId: 
+#   workloadIdentity: false
+#   usePodIdentity: false
+#   useVMManagedIdentity: false
+
+service:
+  type: ClusterIP
+  port: 80
+  # for azure internal load balancers
+  # type: LoadBalancer
+  # annotations: 
+  #   service.beta.kubernetes.io/azure-load-balancer-internal: "true"
 
 imagePullSecrets: []
 # Example:
@@ -34,14 +55,16 @@ imagePullSecrets: []
 #   pullPolicy: Always
 #   tag: "latest"
 
+# pdbAvailablePercent: 50%
+
 serviceAccount:
   # Specifies whether a service account should be created
-  create: true
+  create: false
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  name: "" # ex app-service-identity
 
 podAnnotations: {}
 
@@ -57,18 +80,27 @@ securityContext: {}
   # runAsUser: 1000
 
 # if using traefik, use the image.domainPath to control the ingress and not this
+traefik:
+  enabled: false
+  domainPath: ""  #ingress route definition
+  stripPath: true
+
+# if using cert-manager, ensure the appropriate path and domain
 ingress:
   enabled: false
-  className: ""
-  annotations: {}
+  className: "nginx"
+  domain: chart-example.local
+  path: /example-service
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging" # this will trigger cert-manager to request a certificate
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
+  # hosts: []
+  #   - host: chart-example.local
+  #     paths:
+  #       - path: /
+  #         pathType: ImplementationSpecific
+  # tls: []
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
@@ -89,13 +121,19 @@ replicaCount: 1
 
 autoscaling:
   enabled: false
-  minReplicas: 1
-  maxReplicas: 100
+  minReplicas: 3
+  maxReplicas: 5
   targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
 
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
+
+nameOverride: "" # force chart name (IE release.chart)
+
+namespaceOverride: "" # force specific namespace
+
+fullnameOverride: "" # override naming

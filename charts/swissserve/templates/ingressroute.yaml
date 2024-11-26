@@ -1,4 +1,4 @@
-{{ if and (ne .Values.domainPath "") (hasKey .Values "domainPath") }}
+{{- if .Values.traefik.enabled -}}
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
@@ -18,4 +18,4 @@ spec:
       middlewares:
       - name: "{{ include "helm.fullname" . }}-strip"
       {{ end }}
-{{ end }}
+{{- end }}

@@ -1,4 +1,4 @@
-{{ if and (eq .Values.domainPath "") (hasKey .Values "domainPath") }}
+{{- if .Values.traefik.enabled -}}
 kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:
@@ -12,11 +12,11 @@ spec:
     - host:
       http:
         paths:
-          - path: /{{ .Values.domainPath }}
+          - path: /{{ .Values.traefik.domainPath }}
             pathType: Prefix
             backend:
               service:
                 name:  {{ include "helm.fullname" . }}
                 port:
                   number: {{ .Values.image.containerPort }}
-{{ end }}
+{{- end }}
