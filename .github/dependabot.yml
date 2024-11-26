@@ -1,12 +1,5 @@
 version: 2
 updates:
-  # Helm Chart Updates
-  - package-ecosystem: "helm"
-    directory: "/charts"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 5
-
   # Docker Image Updates for Helm Charts
   - package-ecosystem: "docker"
     directory: "/charts"
@@ -20,8 +13,3 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
-
-# Optional settings
-ignore:
-  - dependency-name: "nginx"
-    versions: ["1.19.*"]
