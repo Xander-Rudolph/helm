@@ -1,0 +1,15 @@
+version: 2
+updates:
+  # Docker Image Updates for Helm Charts
+  - package-ecosystem: "docker"
+    directory: "/charts"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # Dependency Updates for Helm Charts (values.yaml)
+  - package-ecosystem: "github-actions"
+    directory: "/.github/workflows"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
