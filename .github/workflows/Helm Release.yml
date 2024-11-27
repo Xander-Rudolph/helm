@@ -11,9 +11,6 @@ on:
 env:
   working-directory: 'charts'
 
-
-  contents: read
-
 jobs:
   changes:
     name: Check for changes
