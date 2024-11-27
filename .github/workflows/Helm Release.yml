@@ -36,7 +36,8 @@ jobs:
     permissions:
       contents: write
     needs: changes
-    if: ${{ github.ref_name != 'main' && needs.changes.outputs.changes != '[]' }}
+    if: ${{ github.ref_name != 'main' && needs.changes.outputs.changes }}
+    # if: ${{ github.ref_name != 'main' && needs.changes.outputs.changes != '[]' }}
     strategy:
       matrix:
         working_dir: ${{ fromJson(needs.changes.outputs.changes) }}
