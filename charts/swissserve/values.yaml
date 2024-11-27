@@ -6,7 +6,6 @@ image:
 #  force: true # will force pods to redeploy using timestamp label
 #  liveness: /
 #  readiness: /
-#   hostname: internalhostname
 #   envFrom:
 #     secretRefs:
 #       - secret-name
@@ -16,24 +15,24 @@ image:
 #     - name: ENVVARIABLENAME
 #       value: VALUE
 
-# initContainer:
-#   image:
-#   tag:
-#   imagePullPolicy:
-#   command:
-#   env:
-#   - name: ENVVARIABLENAME
-#     value: VALUE
+initContainer: 
+  image:
+  tag:
+  imagePullPolicy:
+  command:
+  env:
+  - name: 
+    value: 
 
-azure:
-  keyVaultName: 
-  kvSecrets:
-  - "key-vault-entry"
-#   clientid:
+azure: 
+  workloadIdentity: false
+  usePodIdentity: false
+  useVMManagedIdentity: false
+#   keyVaultName: 
+#   kvSecrets:
+#   - "key-vault-entry"
+#   clientId:
 #   tenantId: 
-#   workloadIdentity: false
-#   usePodIdentity: false
-#   useVMManagedIdentity: false
 
 service:
   type: ClusterIP
@@ -117,7 +116,7 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-replicaCount: 1
+replicaCount: 3
 
 autoscaling:
   enabled: false
@@ -132,8 +131,8 @@ tolerations: []
 
 affinity: {}
 
-nameOverride: "" # force chart name (IE release.chart)
-
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: ""
 namespaceOverride: "" # force specific namespace
 
-fullnameOverride: "" # override naming

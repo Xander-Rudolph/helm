@@ -7,10 +7,12 @@ metadata:
     {{- include "helm.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.replicaCount | default 1}}
+  {{- else }}
+  replicas: {{ .Values.autoscaling.minReplicas | default 3}}
   {{- end }}
   strategy:
-    type: {{ .Values.deployStrategy | default "Recreate" }}      
+    type: {{ .Values.deployStrategy | default "Recreate" }}    
   selector:
     matchLabels:
       {{- include "helm.selectorLabels" . | nindent 6 }}
@@ -22,17 +24,16 @@ spec:
       {{- end }}
       labels:
         app: {{ include "helm.fullname" . }}
-        {{- if and .Values.azure .Values.azure.workloadIdentity }}
-        azure.workload.identity/use: {{ .Values.azure.workloadIdentity | default false }}
-        {{- end }}
+        azure.workload.identity/use: {{ .Values.azure.workloadIdentity | default false | quote }}
         {{- if .Values.image.force }}
         date: "{{ now | unixEpoch }}"
         {{- end}}    
         {{- include "helm.selectorLabels" . | nindent 8 }}
+        {{- include "helm.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
-      {{- if .Values.image.hostname }}
-      hostname: {{ .Values.image.hostname }}
-      {{- end}}    
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -40,48 +41,36 @@ spec:
       serviceAccountName: {{ include "helm.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      {{- if .Values.initContainer }}
-      initContainers:
-        - name: {{ .Chart.Name }}-init-container
-          {{- if hasKey .Values.initContainer "tag" }}
-          image: {{ .Values.initContainer.image }}:{{ .Values.initContainer.tag }}
-          {{ else }}
-          image: {{ .Values.initContainer.image }}:{{ .Values.image.tag }}
-          {{ end }}
-          imagePullPolicy: {{ .Values.initContainer.pullPolicy }}
-          command: {{ .Values.initContainer.command }}
-          env:
-            {{- if .Values.initContainer.env }}
-              {{- toYaml .Values.initContainer.env | nindent 14 }}
-            {{- end }}
-      {{- end }}
       containers:
         {{- if .Values.sidecarimage }}
         - name: "{{ .Values.sidecarimage.name }}"
           image: "{{ .Values.sidecarimage.repository }}:{{ .Values.sidecarimage.tag }}"
           imagePullPolicy: {{ .Values.sidecarimage.pullPolicy }}
-        {{- end }}          
+        {{- end }}    
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: {{- if .Values.containerimage }}
+            {{ .Values.containerimage }}
+          {{- else }}
+            "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             {{- if .Values.image.env }}
-              {{- toYaml .Values.image.env | nindent 14 }}
+              {{- toYaml .Values.image.env | nindent 2 }}
             {{- end }}
-            {{- if and .Values.azure (hasKey .Values.azure "keyVaultName") .Values.azure.keyVaultName }}
+            {{- if and .Values.azure (hasKey .Values.azure "keyVaultName") }}
             {{- with .Values }}
-            {{- range .kvSecrets }}
-            - name: {{ . | upper | replace "-" "_" }}
-              valueFrom:
-                secretKeyRef:
-                  # name: {{ $.Values.chartName }}-secrets # Use the top-level .Values for chart name
-                  name: {{ include "helm.fullname" . }}-secrets
-                  key: {{ . | lower | replace "_" "-" }}
+              {{- range .kvSecrets }}
+              - name: {{ . | upper | replace "-" "_" }}
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ include "helm.fullname" $ }}-secrets # Use the "helm.fullname" helper function
+                    key: {{ . | lower | replace "_" "-" }}
+              {{- end }}
             {{- end }}
-            {{- end }}
-            {{- end }}
+            {{- end }}            
           {{- if .Values.image.envFrom }}
           envFrom:
             {{- range .Values.image.envFrom.secretRefs }}
@@ -93,7 +82,7 @@ spec:
                   name: {{ . }}
             {{- end }}
           {{- end }}
-          args: [ {{.Values.image.args}} ]          
+          args: [ {{.Values.image.args}} ]
           ports:
             - name: http
               containerPort: {{ .Values.image.containerPort }}
@@ -112,12 +101,19 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-        {{- if and .Values.azure (hasKey .Values.azure "keyVaultName") .Values.azure.keyVaultName }}
-        volumeMounts:
-          - name: kv-store
-            mountPath: "/mnt/secrets-store"
-            readOnly: true
-        {{- end }}
+          volumeMounts:
+            {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- if and .Values.azure (hasKey .Values.azure "keyVaultName") }}
+            - name: kv-store
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+            {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -130,12 +126,15 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if and .Values.azure (hasKey .Values.azure "keyVaultName") .Values.azure.keyVaultName }}
       volumes:
+        {{- with .Values.volumes }}
+        {{- toYaml . | nindent 2 }}
+        {{- end }}
+        {{- if and .Values.azure (hasKey .Values.azure "keyVaultName") }}
         - name: kv-store
           csi:
             driver: secrets-store.csi.k8s.io
             readOnly: true
             volumeAttributes:
-              secretProviderClass: {{ include "helm.fullname" . }}
-      {{- end }}
+              secretProviderClass: {{ include "helm.fullname" . }}-azure-kv
+        {{- end }}
