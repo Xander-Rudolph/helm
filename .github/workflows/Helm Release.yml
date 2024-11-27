@@ -27,10 +27,8 @@ jobs:
         with:
           # TODO: there must be a way to filter what i don't want and summarize it so I don't need to declare it here
           filters: |
-            swissserve:
-              - '${{ env.working-directory }}/swissserve/**'
-            umbrella:
-              - '${{ env.working-directory }}/umbrella/**'
+            swissserve: '${{ env.working-directory }}/swissserve/**'
+            umbrella: '${{ env.working-directory }}/umbrella/**'
 
   scan:
     permissions:
