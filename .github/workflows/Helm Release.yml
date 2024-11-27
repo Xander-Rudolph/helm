@@ -15,6 +15,8 @@ jobs:
   changes:
     name: Check for changes
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
     outputs:
       changes: ${{ steps.changes.outputs.changes }}
     steps:
@@ -30,12 +32,21 @@ jobs:
             swissserve: '${{ env.working-directory }}/swissserve/**'
             umbrella: '${{ env.working-directory }}/umbrella/**'
 
-  scan:
+  review-pr:
+    permissions:
+      pull-requests: write
+      contents: read
+    if: ${{ github.event_name == 'pull_request' }}
+    uses: xander-rudolph/.github/.github/workflows/ollama-pr.yml@main
+    secrets: inherit
+    with:
+      model: codellama
+      
+  bump-version:
     permissions:
       contents: write
     needs: changes
-    if: ${{ github.ref_name != 'main' }}
-    # if: ${{ github.ref_name != 'main' && needs.changes.outputs.changes != '[]' }}
+    if: ${{ github.ref_name != 'main' && github.event_name == 'pull_request' }}
     strategy:
       matrix:
         working_dir: ${{ fromJson(needs.changes.outputs.changes) }}
@@ -119,7 +130,6 @@ jobs:
 
   release:
     if: github.event_name == 'push' && github.ref_name == 'main'
-    needs: scan
     permissions:
       contents: write
     runs-on: ubuntu-latest
