@@ -14,6 +14,7 @@ env:
 jobs:
   changes:
     name: Check for changes
+    if: ${{ github.ref_name != 'main' && github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
@@ -46,7 +47,6 @@ jobs:
     permissions:
       contents: write
     needs: changes
-    if: ${{ github.ref_name != 'main' && github.event_name == 'pull_request' }}
     strategy:
       matrix:
         working_dir: ${{ fromJson(needs.changes.outputs.changes) }}
