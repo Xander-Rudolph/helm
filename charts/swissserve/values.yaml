@@ -28,11 +28,15 @@ azure:
   workloadIdentity: false
   usePodIdentity: false
   useVMManagedIdentity: false
-#   keyVaultName: 
-#   kvSecrets:
-#   - "key-vault-entry"
-#   clientId:
-#   tenantId: 
+  # storage:
+  #   share: public
+  #   class: azurefile-csi
+  #   capacity: 10Gi
+  # keyVaultName: 
+  # kvSecrets:
+  # - "key-vault-entry"
+  # clientId:
+  # tenantId: 
 
 service:
   type: ClusterIP

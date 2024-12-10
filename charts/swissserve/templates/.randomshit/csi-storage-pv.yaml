@@ -1,0 +1,19 @@
+{{- if and .Values.azure.storage (hasKey .Values.azure.storage "share") }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "helm.fullname" . }}-azure-pv
+spec:
+  capacity:
+    storage: {{ .Values.azure.storage.capacity | quote }}
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: {{ include "helm.fullname" . }}-azure-csi
+  csi:
+    driver: file.csi.azure.com
+    volumeHandle: {{ printf "%s#%s" .Values.azure.storage.account .Values.azure.storage.share | quote }}
+    volumeAttributes:
+      shareName: {{ .Values.azure.storage.share | quote }}
+      storageAccountName: {{ .Values.azure.storage.account | quote }}
+{{- end }}

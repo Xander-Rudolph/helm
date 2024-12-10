@@ -1,0 +1,13 @@
+{{- if and .Values.azure.storage (hasKey .Values.azure.storage "account") }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "helm.fullname" . }}-azure-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.azure.storage.capacity | quote }}
+  storageClassName: {{ include "helm.fullname" . }}-azure-csi
+{{- end }}
