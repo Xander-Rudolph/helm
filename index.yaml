@@ -1,6 +1,29 @@
 apiVersion: v1
 entries:
+  grafana:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-01-25T12:22:30.450801197Z"
+    description: A Helm chart for Kubernetes
+    digest: 4b48abca959d84ac67144fb2a25ef355889f52eae59af4e52d69187c3e2874b7
+    icon: file://icon.png
+    name: grafana
+    type: application
+    urls:
+    - https://github.com/Xander-Rudolph/helm/releases/download/grafana-0.4.5/grafana-0.4.5.tgz
+    version: 0.4.5
   swissserve:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-01-25T12:22:30.536860374Z"
+    description: A Helm chart for Kubernetes
+    digest: 7de408acae55cd160c7fa8b41f3a87a2153763a7af45d762fc77e6841401aaf8
+    icon: file://icon.png
+    name: swissserve
+    type: application
+    urls:
+    - https://github.com/Xander-Rudolph/helm/releases/download/swissserve-0.4.7/swissserve-0.4.7.tgz
+    version: 0.4.7
   - apiVersion: v2
     appVersion: 1.16.0
     created: "2024-11-27T19:02:53.886851041Z"
@@ -104,4 +127,4 @@ entries:
     urls:
     - https://github.com/Xander-Rudolph/helm/releases/download/umbrella-1.0.0/umbrella-1.0.0.tgz
     version: 1.0.0
-generated: "2024-11-27T19:02:53.886883111Z"
+generated: "2025-01-25T12:22:30.536895659Z"
