@@ -17,6 +17,7 @@ env:
 jobs:
   changes:
     name: Check for changes
+    if: ${{ github.ref_name != 'main' && github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
