@@ -1,0 +1,11 @@
+{{- if .Values.pdbAvailablePercent -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "helm.fullname" . }}
+spec:
+  minAvailable: {{ .Values.pdbAvailablePercent }}
+  selector:
+    matchLabels:
+      app: {{ include "helm.fullname" . }}
+{{- end }}
