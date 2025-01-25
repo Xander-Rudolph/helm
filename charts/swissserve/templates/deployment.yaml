@@ -135,7 +135,7 @@ spec:
       {{- end }}
       volumes:
         {{- with .Values.volumes }}
-        {{- toYaml . | nindent 2 }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- if and .Values.azure (hasKey .Values.azure "keyVaultName") }}
         - name: kv-store
