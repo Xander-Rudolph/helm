@@ -11,6 +11,9 @@ on:
 env:
   working-directory: 'charts'
 
+
+  contents: read
+
 jobs:
   changes:
     name: Check for changes
@@ -47,6 +50,7 @@ jobs:
     permissions:
       contents: write
     needs: changes
+    if: ${{ github.ref_name != 'main' && github.event_name == 'pull_request' }}
     strategy:
       matrix:
         working_dir: ${{ fromJson(needs.changes.outputs.changes) }}
@@ -148,7 +152,7 @@ jobs:
         uses: azure/setup-helm@v4
 
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.6.0
+        uses: helm/chart-releaser-action@v1.7.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           CR_SKIP_EXISTING: true

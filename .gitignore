@@ -1,3 +1,7 @@
 # build dependencies
 Chart.lock
 **/charts/*.tgz
+**/debug/**
+**/*.ignore
+
+grafana-test-dashboards/*

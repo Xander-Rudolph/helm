@@ -1,0 +1,25 @@
+# https://grafana.com/docs/grafana/latest/datasources/azure-monitor/
+# apiVersion: 1
+# datasources:
+#   - name: azure-monitor
+#     type: grafana-azure-monitor-datasource
+#     access: proxy
+#     jsonData:
+#       azureAuthType: clientsecret
+#       cloudName: azuremonitor
+#       tenantId: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX
+#       clientId: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX
+#       subscriptionId: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX
+#     secureJsonData:
+#       clientSecret: SERVICEPRINCIPALSECRET
+#     version: 1
+# ---
+# apiVersion: 1 
+# datasources:
+#   - name: azure-monitor
+#     type: grafana-azure-monitor-datasource
+#     access: proxy
+#     jsonData:
+#       azureAuthType: msi
+#       subscriptionId: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX
+#     version: 1
