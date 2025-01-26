@@ -11,7 +11,7 @@ on:
 env:
   working-directory: 'charts'
 
-
+permissions:
   contents: read
 
 jobs:
@@ -35,6 +35,7 @@ jobs:
           filters: |
             swissserve: '${{ env.working-directory }}/swissserve/**'
             umbrella: '${{ env.working-directory }}/umbrella/**'
+            mediakube: '${{ env.working-directory }}/mediakube/**'
 
   review-pr:
     permissions:
