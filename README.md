@@ -4,21 +4,21 @@ Welcome to the **Xander-Rudolph Helm Charts** repository! Here you’ll find a c
 
 ## Available Charts
 
-### [Grafana](charts/grafana/README.md)
+### Grafana
 - **Description**: A Helm chart to deploy Grafana with pre-configurations based on folder structures. Perfect for quickly setting up a Grafana instance tailored to your monitoring needs.  
-- **Source Repository**: [GitHub - Grafana Chart](https://github.com/Xander-Rudolph/grafana)
+- **Source Repository**: [GitHub - Grafana Chart](https://github.com/Xander-Rudolph/helm/tree/main/charts/grafana)
 
-### [SwissServe](charts/swissserve/README.md)
+### SwissServe
 - **Description**: A highly flexible and generic Helm chart designed to deploy practically any application or service. It’s a great starting point for custom deployments.  
-- **Source Repository**: [GitHub - SwissServe Chart](https://github.com/Xander-Rudolph/swissserve)
+- **Source Repository**: [GitHub - SwissServe Chart](https://github.com/Xander-Rudolph/helm/tree/main/charts/swissserve)
 
-### [Umbrella](charts/umbrella/README.md)
+### Umbrella
 - **Description**: A starter template designed to streamline project setups with predefined GitHub authentication tokens and other common configurations. Ideal for new projects needing a strong starting point.  
-- **Source Repository**: [GitHub - Umbrella Chart](https://github.com/Xander-Rudolph/umbrella)
+- **Source Repository**: [GitHub - Umbrella Chart](https://github.com/Xander-Rudolph/helm/tree/main/charts/umbrella)
 
-### [MediaKube](charts/mediakube/README.md)
+### MediaKube
 - **Description**: A comprehensive Helm chart that bundles the *arr suite of applications (Sonarr, Radarr, etc.) for managing media in Kubernetes. Simplify your media workflow with this pre-configured solution.  
-- **Source Repository**: [GitHub - MediaKube Chart](https://github.com/Xander-Rudolph/mediakube)
+- **Source Repository**: [GitHub - MediaKube Chart](https://github.com/Xander-Rudolph/helm/tree/main/charts/mediakube)
 
 ---
 
