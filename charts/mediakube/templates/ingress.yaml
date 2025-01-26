@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: localhost
+    http:
+      paths: &common-paths
+      - path: /transmission/web
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Release.Name }}-transmission
+            port:
+              number: {{ .Values.transmission.service.port }}
+  {{- if hasKey .Values.global "dnsName"}}
+  - host: {{ .Values.global.dnsName }}
+    http:
+      paths: *common-paths
+  {{- end}}

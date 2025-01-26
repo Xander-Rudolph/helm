@@ -1,0 +1,49 @@
+apiVersion: v2
+name: mediakube
+description: A Helm chart for transmission deployed behind a traefik ingress
+type: application
+version: 2.0.0
+appVersion: "0.0.1"
+# Not having an icon will throw a lint warning so here it is
+icon: file://icon.png
+dependencies:
+  - name: traefik
+    version: "^10.30.0"
+    repository: https://helm.traefik.io/traefik
+  - name: swissserve
+    version: "0.4.9"
+    repository: https://xander-rudolph.github.io/helm
+    alias: transmission
+  - name: swissserve
+    version: "0.4.9"
+    repository: https://xander-rudolph.github.io/helm
+    alias: sonarr
+  - name: swissserve
+    version: "0.4.9"
+    repository: https://xander-rudolph.github.io/helm
+    alias: radarr
+  - name: swissserve
+    version: "0.4.9"
+    repository: https://xander-rudolph.github.io/helm
+    alias: prowlarr
+  - name: swissserve
+    version: "0.4.9"
+    repository: https://xander-rudolph.github.io/helm
+    alias: readarr
+  - name: swissserve
+    version: "0.4.9"
+    repository: https://xander-rudolph.github.io/helm
+    alias: lidarr
+  - name: swissserve
+    version: "0.4.9"
+    repository: https://xander-rudolph.github.io/helm
+    alias: bazarr
+  - name: swissserve
+    version: "0.4.9"
+    repository: https://xander-rudolph.github.io/helm
+    alias: ombi
+  - name: swissserve
+    version: "0.4.9"
+    repository: https://xander-rudolph.github.io/helm
+    alias: emulatorjs
+

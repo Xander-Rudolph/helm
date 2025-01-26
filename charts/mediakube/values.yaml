@@ -1,0 +1,533 @@
+#################
+# Global config #
+#################
+global:
+  configRoot: /mnt/e/kubestore
+  configCapacity: 10Gi
+  mediaRoot: /mnt/media # this has other references... make sure you check
+  mediaCapacity: 15Ti
+  timezone: Etc/UTC
+  PGID: 0
+  PUID: 0
+  dnsName: ryzen9.internal.rudolphhome.com
+  ApiKey: 948a50495c4a471186082389b8847c97
+  pia_username: p5353753
+  pia_password: baOHE94NSmPlSj7NTTG6
+  transmission_password: transmission
+  transmission_username: transmission
+# global:
+#   configRoot: /mnt/kubestore
+#   configCapacity: 10Gi
+#   mediaRoot: /mnt/media # this has other references... make sure you check
+#   mediaCapacity: 15Ti
+#   timezone: Etc/UTC
+#   PGID: 0
+#   PUID: 0
+#   dnsName: internal.example.com
+#   # When not defined, the following will need to be put into the app settings to avoid issues
+#   ApiKey: 
+#   pia_username: 
+#   pia_password: 
+#   transmission_password: 
+#   transmission_username:
+
+# # https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml  
+# traefik:
+#   enableTraefikDashboard: true
+#   creds:
+#     user: administrator
+#     password: Dashboard
+#   image:
+#     pullPolicy: Always
+#   service:
+#     type: LoadBalancer
+#   providers:
+#     kubernetesCRD:
+#       allowCrossNamespace: true
+
+# postgres:
+#   host: 192.168.0.1
+#   user: postgres
+#   password: postgres
+#   database: postgres
+#   port: 5432
+
+####################
+# Media app config #
+####################
+transmission:
+  username: transmission
+  password: transmission 
+  download: /mnt/media/completed
+  incomplete_enabled: true
+  incomplete: /mnt/media/incomplete
+  uiversion: kettu # combustion, kettu, transmission-web-control, flood-for-transmission, shift, transmissionic... requires config purge
+  image:
+    repository: haugene/transmission-openvpn
+    tag: "latest"
+    force: true
+    pullPolicy: Always
+    containerPort: 9091
+    hostname: transmission
+    envFrom:
+      secretRefs:
+      - "transmission-vpn-secret"
+      configMapRefs:
+      - "transmission-vpn-configmap"
+      - "general-configmap"
+  vpn:
+    # these can be declared here but will be superceeded by globals
+    username:  
+    password: 
+    LOCAL_NETWORK: "10.1.0.0/16" 
+    OPENVPN_PROVIDER: PIA
+    OPENVPN_CONFIG: us_seattle
+    TRANSMISSION_HOME: /config/transmission-home
+  service: 
+    type: ClusterIP
+    port: 80
+  volumes:
+    - name: config-vol
+      persistentVolumeClaim:
+        claimName: config-pvc
+    - name: media-vol
+      persistentVolumeClaim:
+        claimName: media-pvc
+  volumeMounts:
+    - name: config-vol
+      mountPath: /config
+      subPath: transmission
+    - name: media-vol
+      mountPath: /mnt/media
+  # this is to address the RTNETLINK answers: Operation not permitted error
+  podSecurityContext:
+    capabilities:
+      add:
+        - NET_ADMIN
+
+sonarr:
+  image:
+    repository: lscr.io/linuxserver/sonarr
+    tag: "latest"
+    pullPolicy: Always
+    containerPort: 8989
+    hostname: sonarr
+    envFrom:
+      configMapRefs:
+      - "general-configmap"
+  serviceAccount:
+    create: true
+    name: "sonarr"    
+  config:
+    UrlBase:
+    LogLevel: info
+    UpdateMechanism: Docker
+    BindAddress: "*"
+    Port: 8989
+    SslPort: 9898
+    EnableSsl: False
+    ApiKey: abcd1234-5678-FAKEKEY-DO-NOT-USE
+    LaunchBrowser: True
+    AuthenticationMethod: Forms
+    AuthenticationRequired: DisabledForLocalAddresses
+    Branch: main
+    SslCertPath: 
+    SslCertPassword: 
+    InstanceName: Sonarr
+  # postgres:
+  #   user: "sonarr"
+  #   password: "sonarr"
+  initContainers:
+    # Initialize config.xml for the specific subpath in the persistent volume
+    - name: set-config-xml
+      image: busybox:latest
+      volumeMounts:
+        - name: config-vol
+          mountPath: /config
+        - name: file-config
+          mountPath: /preload        
+      command: ['sh', '-c', "if [ ! -f /config/sonarr/config.xml ]; then mkdir -p /config/sonarr && cp /preload/config.xml /config/sonarr/config.xml; fi"]
+    # - name: prep-postgres-sonarr
+    #   image: ghcr.io/xander-rudolph/postgres-prep:latest
+    #   envFrom:
+    #     - secretRef:
+    #         name: "postgres-secret"
+    #     - secretRef:
+    #         name: "sonarr-secret"
+    #   env:
+    #     - name: DATABASE_NAME
+    #       value: sonarr      
+  volumes:
+    - name: config-vol
+      persistentVolumeClaim:
+        claimName: config-pvc
+    - name: media-vol
+      persistentVolumeClaim:
+        claimName: media-pvc
+    - name: file-config
+      configMap:
+        name: "sonarr-startup"
+        items:
+          - key: config.xml
+            path: config.xml
+  volumeMounts:
+    - name: config-vol
+      mountPath: /config
+      subPath: sonarr
+    - name: media-vol
+      mountPath: /mnt/media
+
+radarr:
+  image:
+    repository: lscr.io/linuxserver/radarr
+    tag: "latest"
+    pullPolicy: Always
+    containerPort: 7878
+    hostname: radarr
+    envFrom:
+      configMapRefs:
+      - "general-configmap"
+  serviceAccount:
+    create: true
+    name: "radarr"    
+  config:
+    UrlBase:
+    LogLevel: info
+    UpdateMechanism: Docker
+    BindAddress: "*"
+    Port: 7878
+    SslPort: 9898
+    EnableSsl: False
+    ApiKey: abcd1234-5678-FAKEKEY-DO-NOT-USE
+    LaunchBrowser: True
+    AuthenticationMethod: Forms
+    AuthenticationRequired: DisabledForLocalAddresses
+    Branch: master
+    SslCertPath: 
+    SslCertPassword: 
+    InstanceName: Radarr
+  # postgres:
+  #   user: "radarr"
+  #   password: "radarr"
+  initContainers:
+    # Initialize config.xml for the specific subpath in the persistent volume
+    - name: set-config-xml
+      image: busybox:latest
+      volumeMounts:
+        - name: config-vol
+          mountPath: /config
+        - name: file-config
+          mountPath: /preload        
+      command: ['sh', '-c', "if [ ! -f /config/radarr/config.xml ]; then mkdir -p /config/radarr && cp /preload/config.xml /config/radarr/config.xml; fi"]
+    # - name: prep-postgres-radarrmain
+    #   image: ghcr.io/xander-rudolph/postgres-prep:latest
+    #   envFrom:
+    #     - secretRef:
+    #         name: "postgres-secret"
+    #     - secretRef:
+    #         name: "radarr-secret"
+    #   env:
+    #     - name: DATABASE_NAME
+    #       value: radarr
+    # - name: prep-postgres-radarrlog
+    #   image: ghcr.io/xander-rudolph/postgres-prep:latest
+    #   envFrom:
+    #     - secretRef:
+    #         name: "postgres-secret"
+    #     - secretRef:
+    #         name: "radarr-secret"
+    #   env:
+    #     - name: DATABASE_NAME
+    #       value: radarrlog
+  volumes:
+    - name: config-vol
+      persistentVolumeClaim:
+        claimName: config-pvc
+    - name: media-vol
+      persistentVolumeClaim:
+        claimName: media-pvc
+    - name: file-config
+      configMap:
+        name: "radarr-startup"
+        items:
+          - key: config.xml
+            path: config.xml
+  volumeMounts:
+    - name: config-vol
+      mountPath: /config
+      subPath: radarr
+    - name: media-vol
+      mountPath: /mnt/media
+
+prowlarr:
+  image:
+    repository: lscr.io/linuxserver/prowlarr
+    tag: "latest"
+    pullPolicy: Always
+    containerPort: 9696
+    hostname: prowlarr
+    envFrom:
+      configMapRefs:
+      - "general-configmap"
+  serviceAccount:
+    create: true
+    name: "prowlarr"    
+  config:
+    UrlBase:
+    LogLevel: info
+    UpdateMechanism: Docker
+    BindAddress: "*"
+    Port: 9696
+    SslPort: 6969
+    EnableSsl: False
+    ApiKey: abcd1234-5678-FAKEKEY-DO-NOT-USE
+    LaunchBrowser: True
+    AuthenticationMethod: Forms
+    AuthenticationRequired: DisabledForLocalAddresses
+    Branch: master
+    SslCertPath: 
+    SslCertPassword: 
+    InstanceName: Prowlarr
+  initContainers:
+    # Initialize config.xml for the specific subpath in the persistent volume
+    - name: set-config-xml
+      image: busybox:latest
+      volumeMounts:
+        - name: config-vol
+          mountPath: /config
+        - name: file-config
+          mountPath: /preload        
+      command: ['sh', '-c', "if [ ! -f /config/prowlarr/config.xml ]; then mkdir -p /config/prowlarr && cp /preload/config.xml /config/prowlarr/config.xml; fi"]
+  volumes:
+    - name: config-vol
+      persistentVolumeClaim:
+        claimName: config-pvc
+    - name: media-vol
+      persistentVolumeClaim:
+        claimName: media-pvc
+    - name: file-config
+      configMap:
+        name: "prowlarr-startup"
+        items:
+          - key: config.xml
+            path: config.xml
+  volumeMounts:
+    - name: config-vol
+      mountPath: /config
+      subPath: prowlarr
+    - name: media-vol
+      mountPath: /mnt/media
+
+readarr:
+  image:
+    repository: lscr.io/linuxserver/readarr
+    tag: "develop"
+    pullPolicy: Always
+    containerPort: 8787
+    hostname: readarr
+    envFrom:
+      configMapRefs:
+      - "general-configmap"
+  serviceAccount:
+    create: true
+    name: "readarr"    
+  config:
+    UrlBase:
+    LogLevel: info
+    UpdateMechanism: Docker
+    BindAddress: "*"
+    Port: 8787
+    SslPort: 6868
+    EnableSsl: False
+    ApiKey: abcd1234-5678-FAKEKEY-DO-NOT-USE
+    LaunchBrowser: True
+    AuthenticationMethod: Forms
+    AuthenticationRequired: DisabledForLocalAddresses
+    Branch: main
+    SslCertPath: 
+    SslCertPassword: 
+    InstanceName: readarr
+  initContainers:
+    # Initialize config.xml for the specific subpath in the persistent volume
+    - name: set-config-xml
+      image: busybox:latest
+      volumeMounts:
+        - name: config-vol
+          mountPath: /config
+        - name: file-config
+          mountPath: /preload        
+      command: ['sh', '-c', "if [ ! -f /config/readarr/config.xml ]; then mkdir -p /config/readarr && cp /preload/config.xml /config/readarr/config.xml; fi"]  
+  volumes:
+    - name: config-vol
+      persistentVolumeClaim:
+        claimName: config-pvc
+    - name: media-vol
+      persistentVolumeClaim:
+        claimName: media-pvc
+    - name: file-config
+      configMap:
+        name: "readarr-startup"
+        items:
+          - key: config.xml
+            path: config.xml
+  volumeMounts:
+    - name: config-vol
+      mountPath: /config
+      subPath: readarr
+    - name: media-vol
+      mountPath: /mnt/media
+
+lidarr:
+  image:
+    repository: lscr.io/linuxserver/lidarr
+    tag: "latest"
+    pullPolicy: Always
+    containerPort: 8787
+    hostname: lidarr
+    envFrom:
+      configMapRefs:
+      - "general-configmap"
+  serviceAccount:
+    create: true
+    name: "lidarr"    
+  config:
+    UrlBase:
+    LogLevel: info
+    UpdateMechanism: Docker
+    BindAddress: "*"
+    Port: 8787
+    SslPort: 6868
+    EnableSsl: False
+    ApiKey: abcd1234-5678-FAKEKEY-DO-NOT-USE
+    LaunchBrowser: True
+    AuthenticationMethod: Forms
+    AuthenticationRequired: DisabledForLocalAddresses
+    Branch: master
+    SslCertPath: 
+    SslCertPassword: 
+    InstanceName: Lidarr
+  initContainers:
+    # Initialize config.xml for the specific subpath in the persistent volume
+    - name: set-config-xml
+      image: busybox:latest
+      volumeMounts:
+        - name: config-vol
+          mountPath: /config
+        - name: file-config
+          mountPath: /preload        
+      command: ['sh', '-c', "if [ ! -f /config/lidarr/config.xml ]; then mkdir -p /config/lidarr && cp /preload/config.xml /config/lidarr/config.xml; fi"]  
+  volumes:
+    - name: config-vol
+      persistentVolumeClaim:
+        claimName: config-pvc
+    - name: media-vol
+      persistentVolumeClaim:
+        claimName: media-pvc
+    - name: file-config
+      configMap:
+        name: "lidarr-startup"
+        items:
+          - key: config.xml
+            path: config.xml
+  volumeMounts:
+    - name: config-vol
+      mountPath: /config
+      subPath: lidarr
+    - name: media-vol
+      mountPath: /mnt/media
+
+bazarr:
+  image:
+    repository: lscr.io/linuxserver/bazarr
+    tag: "latest"
+    pullPolicy: Always
+    containerPort: 6767
+    hostname: bazarr
+    envFrom:
+      configMapRefs:
+      - "general-configmap"
+  serviceAccount:
+    create: true
+    name: "bazarr"    
+  config:
+    UrlBase: /
+    Port: 6767
+    ApiKey: abcd1234-5678-FAKEKEY-DO-NOT-USE
+    AuthenticationMethod: forms
+  initContainers:
+    # Initialize config.xml for the specific subpath in the persistent volume
+    - name: set-config-xml
+      image: busybox:latest
+      volumeMounts:
+        - name: config-vol
+          mountPath: /config
+        - name: file-config
+          mountPath: /preload        
+      command: ['sh', '-c', "if [ ! -f /config/bazarr/config/config.yaml ]; then mkdir -p /config/bazarr/config && cp /preload/config.yaml /config/bazarr/config/config.yaml; fi"]  
+  volumes:
+    - name: config-vol
+      persistentVolumeClaim:
+        claimName: config-pvc
+    - name: media-vol
+      persistentVolumeClaim:
+        claimName: media-pvc
+    - name: file-config
+      configMap:
+        name: "bazarr-startup"
+        items:
+          - key: config.yaml
+            path: config.yaml
+  volumeMounts:
+    - name: config-vol
+      mountPath: /config
+      subPath: bazarr
+    - name: media-vol
+      mountPath: /mnt/media
+
+ombi:
+  image:
+    repository: lscr.io/linuxserver/ombi
+    tag: "latest"
+    pullPolicy: Always
+    containerPort: 3579
+    hostname: ombi
+    envFrom:
+      configMapRefs:
+      - "general-configmap"
+  serviceAccount:
+    create: true
+    name: "ombi"    
+  volumes:
+    - name: config-vol
+      persistentVolumeClaim:
+        claimName: config-pvc
+  volumeMounts:
+    - name: config-vol
+      mountPath: /config
+      subPath: ombi
+
+emulatorjs:
+  image:
+    repository: lscr.io/linuxserver/emulatorjs
+    tag: "latest"
+    pullPolicy: Always
+    containerPort: 80 
+    additionalPorts: 
+      - name: backend
+        containerPort: 3000 # port 3000 is for admin
+        protocol: TCP
+    hostname: emulatorjs
+    envFrom:
+      configMapRefs:
+      - "general-configmap"
+  serviceAccount:
+    create: true
+    name: "emulatorjs"    
+  volumes:
+    - name: config-vol
+      persistentVolumeClaim:
+        claimName: config-pvc
+  volumeMounts:
+    - name: config-vol
+      mountPath: /config
+      subPath: emulatorjs

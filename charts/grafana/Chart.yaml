@@ -26,7 +26,6 @@ appVersion: "1.16.0"
 # Not having an icon will throw a lint warning so here it is
 icon: file://icon.png
 
-# this doesn't work because of the replica requirement
 # dependencies:
 #   - name: prometheus
 #     version: "20.0.0" 
