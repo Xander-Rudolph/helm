@@ -94,6 +94,9 @@ spec:
             - name: http
               containerPort: {{ .Values.image.containerPort }}
               protocol: TCP
+            {{- if hasKey .Values.image "additionalPorts" }}
+            {{- toYaml .Values.image.additionalPorts | nindent 12 }}
+            {{- end }}
           {{- if and (hasKey .Values.image "liveness") .Values.image.liveness }}
           livenessProbe:
             httpGet:
