@@ -1,0 +1,49 @@
+# https://wiki.servarr.com/sonarr/postgres-setup
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "sonarr-startup"
+data:
+  {{- if hasKey .Values.sonarr "postgres" }}
+  config.xml: |
+    <Config>
+      <Type>PostgreSQL</Type>
+      <Host>{{ .Values.postgres.host }}</Host>
+      <Port>{{ .Values.postgres.port }}</Port>
+      <Database>sonarr</Database>
+      <Username>{{ .Values.sonarr.postgres.user }}</Username>
+      <Password>{{ .Values.sonarr.postgres.password }}</Password>
+      <UrlBase>{{ .Values.sonarr.config.UrlBase }}</UrlBase>
+      <LogLevel>{{ .Values.sonarr.config.LogLevel }}</LogLevel>      
+      <UpdateMechanism>{{ .Values.sonarr.config.UpdateMechanism }}</UpdateMechanism>      
+      <BindAddress>{{ .Values.sonarr.config.BindAddress }}</BindAddress>      
+      <Port>{{ .Values.sonarr.config.Port }}</Port>      
+      <SslPort>{{ .Values.sonarr.config.SslPort }}</SslPort>      
+      <EnableSsl>{{ .Values.sonarr.config.EnableSsl }}</EnableSsl>      
+      <LaunchBrowser>{{ .Values.sonarr.config.LaunchBrowser }}</LaunchBrowser>      
+      <AuthenticationMethod>{{ .Values.sonarr.config.AuthenticationMethod }}</AuthenticationMethod>      
+      <Branch>{{ .Values.sonarr.config.Branch }}</Branch>      
+      <SslCertHash>{{ .Values.sonarr.config.SslCertHash }}</SslCertHash>      
+      <InstanceName>{{ .Values.sonarr.config.InstanceName }}</InstanceName>      
+      <SyslogPort>{{ .Values.sonarr.config.SyslogPort }}</SyslogPort>
+    </Config>
+  {{- else }}
+  config.xml: |
+    <Config>
+      <BindAddress>{{ .Values.sonarr.config.BindAddress }}</BindAddress>      
+      <Port>{{ .Values.sonarr.config.Port }}</Port>      
+      <SslPort>{{ .Values.sonarr.config.SslPort }}</SslPort>      
+      <EnableSsl>{{ .Values.sonarr.config.EnableSsl }}</EnableSsl>      
+      <LaunchBrowser>{{ .Values.sonarr.config.LaunchBrowser }}</LaunchBrowser>      
+      <ApiKey>{{ default .Values.sonarr.config.ApiKey .Values.global.ApiKey }}</ApiKey>
+      <AuthenticationMethod>{{ .Values.sonarr.config.AuthenticationMethod }}</AuthenticationMethod>      
+      <AuthenticationRequired>{{ .Values.sonarr.config.AuthenticationRequired }}</AuthenticationRequired>
+      <Branch>{{ .Values.sonarr.config.Branch }}</Branch>      
+      <LogLevel>{{ .Values.sonarr.config.LogLevel }}</LogLevel>      
+      <SslCertPath>{{ .Values.sonarr.config.SslCertPath }}</SslCertPath>      
+      <SslCertPassword>{{ .Values.sonarr.config.SslCertPassword }}</SslCertPassword>      
+      <UrlBase>{{ .Values.sonarr.config.UrlBase }}</UrlBase>
+      <InstanceName>{{ .Values.sonarr.config.InstanceName }}</InstanceName>      
+      <UpdateMechanism>{{ .Values.sonarr.config.UpdateMechanism }}</UpdateMechanism>      
+    </Config>
+  {{- end }}

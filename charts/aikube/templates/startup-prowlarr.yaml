@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "prowlarr-startup"
+data:
+  config.xml: |
+    <Config>
+      <UrlBase>{{ .Values.prowlarr.config.UrlBase }}</UrlBase>
+      <LogLevel>{{ .Values.prowlarr.config.LogLevel }}</LogLevel>      
+      <UpdateMechanism>{{ .Values.prowlarr.config.UpdateMechanism }}</UpdateMechanism>      
+      <BindAddress>{{ .Values.prowlarr.config.BindAddress }}</BindAddress>      
+      <Port>{{ .Values.prowlarr.config.Port }}</Port>      
+      <SslPort>{{ .Values.prowlarr.config.SslPort }}</SslPort>      
+      <EnableSsl>{{ .Values.prowlarr.config.EnableSsl }}</EnableSsl>      
+      <LaunchBrowser>{{ .Values.prowlarr.config.LaunchBrowser }}</LaunchBrowser>      
+      <AuthenticationMethod>{{ .Values.prowlarr.config.AuthenticationMethod }}</AuthenticationMethod>      
+      <AuthenticationRequired>{{ .Values.prowlarr.config.AuthenticationRequired }}</AuthenticationRequired>      
+      <ApiKey>{{ default .Values.prowlarr.config.ApiKey .Values.global.ApiKey }}</ApiKey>      
+      <Branch>{{ .Values.prowlarr.config.Branch }}</Branch>      
+      <SslCertPath>{{ .Values.prowlarr.config.SslCertPath }}</SslCertPath>      
+      <SslCertPassword>{{ .Values.prowlarr.config.SslCertPassword }}</SslCertPassword>      
+      <InstanceName>{{ .Values.prowlarr.config.InstanceName }}</InstanceName>        
+    </Config>

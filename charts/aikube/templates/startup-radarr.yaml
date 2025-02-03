@@ -1,0 +1,49 @@
+# https://wiki.servarr.com/radarr/postgres-setup
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "radarr-startup"
+data:
+  {{- if hasKey .Values.radarr "postgres" }}
+  config.xml: |
+    <Config>
+      <UrlBase>{{ .Values.radarr.config.UrlBase }}</UrlBase>
+      <PostgresUser>{{ .Values.radarr.postgres.user }}</PostgresUser> 
+      <PostgresPassword>{{ .Values.radarr.postgres.password }}</PostgresPassword>
+      <PostgresPort>{{ .Values.postgres.port }}</PostgresPort>    
+      <PostgresHost>{{ .Values.postgres.host }}</PostgresHost>      
+      <PostgresMainDb>radarr</PostgresMainDb>
+      <PostgresLogDb>radarrlog</PostgresLogDb>
+      <LogLevel>{{ .Values.radarr.config.LogLevel }}</LogLevel>      
+      <UpdateMechanism>{{ .Values.radarr.config.UpdateMechanism }}</UpdateMechanism>      
+      <BindAddress>{{ .Values.radarr.config.BindAddress }}</BindAddress>      
+      <Port>{{ .Values.radarr.config.Port }}</Port>      
+      <SslPort>{{ .Values.radarr.config.SslPort }}</SslPort>      
+      <EnableSsl>{{ .Values.radarr.config.EnableSsl }}</EnableSsl>      
+      <LaunchBrowser>{{ .Values.radarr.config.LaunchBrowser }}</LaunchBrowser>      
+      <AuthenticationMethod>{{ .Values.radarr.config.AuthenticationMethod }}</AuthenticationMethod>      
+      <Branch>{{ .Values.radarr.config.Branch }}</Branch>      
+      <SslCertPath>{{ .Values.radarr.config.SslCertPath }}</SslCertPath>      
+      <SslCertPassword>{{ .Values.radarr.config.SslCertPassword }}</SslCertPassword>      
+      <InstanceName>{{ .Values.radarr.config.InstanceName }}</InstanceName>      
+    </Config>
+  {{- else }}
+  config.xml: |
+    <Config>
+      <BindAddress>{{ .Values.radarr.config.BindAddress }}</BindAddress>
+      <Port>{{ .Values.radarr.config.Port }}</Port>
+      <SslPort>{{ .Values.radarr.config.SslPort }}</SslPort>
+      <EnableSsl>{{ .Values.radarr.config.EnableSsl }}</EnableSsl>
+      <LaunchBrowser>{{ .Values.radarr.config.LaunchBrowser }}</LaunchBrowser>
+      <ApiKey>{{ default .Values.radarr.config.ApiKey .Values.global.ApiKey }}</ApiKey>
+      <AuthenticationMethod>{{ .Values.radarr.config.AuthenticationMethod }}</AuthenticationMethod>
+      <AuthenticationRequired>{{ .Values.radarr.config.AuthenticationRequired }}</AuthenticationRequired>
+      <Branch>{{ .Values.radarr.config.Branch }}</Branch>
+      <LogLevel>{{ .Values.radarr.config.LogLevel }}</LogLevel>
+      <SslCertPath>{{ .Values.radarr.config.SslCertPath }}</SslCertPath>
+      <SslCertPassword>{{ .Values.radarr.config.SslCertPassword }}</SslCertPassword>
+      <UrlBase>{{ .Values.radarr.config.UrlBase }}</UrlBase>
+      <InstanceName>{{ .Values.radarr.config.InstanceName }}</InstanceName>
+      <UpdateMechanism>{{ .Values.radarr.config.UpdateMechanism }}</UpdateMechanism>  
+    </Config>
+  {{- end }}

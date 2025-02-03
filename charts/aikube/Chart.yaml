@@ -1,0 +1,28 @@
+apiVersion: v2
+name: aikube
+description: A Helm chart for openweb-ui
+type: application
+version: 1.0.0
+appVersion: "0.0.1"
+# Not having an icon will throw a lint warning so here it is
+icon: file://icon.png
+dependencies:
+  - name: traefik
+    version: "^10.30.0"
+    repository: https://helm.traefik.io/traefik
+  - name: swissserve
+    version: "0.4.9"
+    repository: https://xander-rudolph.github.io/helm
+    alias: stable-diffusion-webui
+  - name: swissserve
+    version: "0.4.9"
+    repository: https://xander-rudolph.github.io/helm
+    alias: ollama
+  - name: swissserve
+    version: "0.4.9"
+    repository: https://xander-rudolph.github.io/helm
+    alias: open-webui
+  - name: swissserve
+    version: "0.4.9"
+    repository: https://xander-rudolph.github.io/helm
+    alias: searxng

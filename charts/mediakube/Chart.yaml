@@ -7,9 +7,15 @@ appVersion: "0.0.1"
 # Not having an icon will throw a lint warning so here it is
 icon: file://icon.png
 dependencies:
-  - name: traefik
-    version: "^10.30.0"
-    repository: https://helm.traefik.io/traefik
+  # https://cert-manager.io/docs/
+  - name: cert-manager
+    version: v1.16.3
+    repository: https://charts.jetstack.io
+    alias: cert-manager
+    condition: cert-manager.enabled
+  # - name: traefik
+  #   version: "^10.30.0"
+  #   repository: https://helm.traefik.io/traefik
   - name: swissserve
     version: "0.4.9"
     repository: https://xander-rudolph.github.io/helm

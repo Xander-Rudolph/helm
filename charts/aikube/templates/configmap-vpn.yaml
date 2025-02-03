@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "transmission-vpn-configmap"
+data:
+  LOCAL_NETWORK: {{ .Values.transmission.vpn.LOCAL_NETWORK }}
+  OPENVPN_PROVIDER: {{ .Values.transmission.vpn.OPENVPN_PROVIDER }}
+  OPENVPN_CONFIG: {{ .Values.transmission.vpn.OPENVPN_CONFIG }}
+  TRANSMISSION_WEB_UI: {{ .Values.transmission.uiversion }}
+  TRANSMISSION_DOWNLOAD_DIR: {{ .Values.transmission.download }}
+  TRANSMISSION_INCOMPLETE_DIR: {{ .Values.transmission.incomplete }}
+  TRANSMISSION_INCOMPLETE_DIR_ENABLED: {{ .Values.transmission.incomplete_enabled | quote }}

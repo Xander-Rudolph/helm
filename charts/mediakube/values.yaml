@@ -2,34 +2,43 @@
 # Global config #
 #################
 global:
-  configRoot: /mnt/e/kubestore
+  configRoot: /mnt/kubestore
   configCapacity: 10Gi
   mediaRoot: /mnt/media # this has other references... make sure you check
   mediaCapacity: 15Ti
   timezone: Etc/UTC
   PGID: 0
   PUID: 0
-  dnsName: ryzen9.internal.rudolphhome.com
-  ApiKey: 948a50495c4a471186082389b8847c97
-  pia_username: p5353753
-  pia_password: baOHE94NSmPlSj7NTTG6
-  transmission_password: transmission
-  transmission_username: transmission
-# global:
-#   configRoot: /mnt/kubestore
-#   configCapacity: 10Gi
-#   mediaRoot: /mnt/media # this has other references... make sure you check
-#   mediaCapacity: 15Ti
-#   timezone: Etc/UTC
-#   PGID: 0
-#   PUID: 0
-#   dnsName: internal.example.com
-#   # When not defined, the following will need to be put into the app settings to avoid issues
-#   ApiKey: 
-#   pia_username: 
-#   pia_password: 
-#   transmission_password: 
-#   transmission_username:
+  dnsName: internal.example.com
+  # When not defined, the following will need to be put into the app settings to avoid issues
+  ApiKey: 
+  pia_username: 
+  pia_password: 
+  transmission_password: 
+  transmission_username:
+
+cert-manager:
+  enabled: true
+  installCRDs: true
+  namespace: "kube-system"
+
+#TODO: configure nginx
+
+#TODO: add hydra
+# services:
+#   nzbhydra2:
+#     image: lscr.io/linuxserver/nzbhydra2:latest
+#     container_name: nzbhydra2
+#     environment:
+#       - PUID=1000
+#       - PGID=1000
+#       - TZ=Etc/UTC
+#     volumes:
+#       - /path/to/nzbhydra2/data:/config
+#       - /path/to/downloads:/downloads #optional
+#     ports:
+#       - 5076:5076
+#     restart: unless-stopped
 
 # # https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml  
 # traefik:
