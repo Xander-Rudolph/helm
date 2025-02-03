@@ -1,5 +1,37 @@
 apiVersion: v1
 entries:
+  aikube:
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2025-02-03T17:39:22.481940557Z"
+    dependencies:
+    - name: traefik
+      repository: https://helm.traefik.io/traefik
+      version: ^10.30.0
+    - alias: stable-diffusion-webui
+      name: swissserve
+      repository: https://xander-rudolph.github.io/helm
+      version: 0.4.9
+    - alias: ollama
+      name: swissserve
+      repository: https://xander-rudolph.github.io/helm
+      version: 0.4.9
+    - alias: open-webui
+      name: swissserve
+      repository: https://xander-rudolph.github.io/helm
+      version: 0.4.9
+    - alias: searxng
+      name: swissserve
+      repository: https://xander-rudolph.github.io/helm
+      version: 0.4.9
+    description: A Helm chart for openweb-ui
+    digest: 9f8abdca740912ef39c7e60fd60c8ada87493671695d3af613e931b41b9812f5
+    icon: file://icon.png
+    name: aikube
+    type: application
+    urls:
+    - https://github.com/Xander-Rudolph/helm/releases/download/aikube-1.0.0/aikube-1.0.0.tgz
+    version: 1.0.0
   grafana:
   - apiVersion: v2
     appVersion: 1.16.0
@@ -201,4 +233,4 @@ entries:
     urls:
     - https://github.com/Xander-Rudolph/helm/releases/download/umbrella-1.0.0/umbrella-1.0.0.tgz
     version: 1.0.0
-generated: "2025-01-26T14:01:39.13674615Z"
+generated: "2025-02-03T17:39:22.956009632Z"
