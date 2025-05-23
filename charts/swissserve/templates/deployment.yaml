@@ -44,6 +44,10 @@ spec:
         nameservers:
           {{ toYaml .Values.dnsConfig.nameservers | nindent 8 }}
       {{- end }}  
+      {{- if .Values.hostAliases }}
+      hostAliases:
+        {{- toYaml .Values.hostAliases | nindent 8 }}
+      {{- end }}
       {{- if .Values.initContainers }}
       initContainers:
         {{- toYaml .Values.initContainers | nindent 8 }}
