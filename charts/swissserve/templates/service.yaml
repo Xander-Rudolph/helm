@@ -8,6 +8,9 @@ metadata:
     {{- toYaml .Values.service.annotations | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
+{{- if and (eq .Values.service.type "LoadBalancer") .Values.service.ip }}
+  loadBalancerIP: {{ .Values.service.ip }}
+{{- end }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.image.containerPort }}
